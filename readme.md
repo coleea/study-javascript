@@ -402,10 +402,10 @@ A. 빌트인 기능은 없다. 하지만 비슷하게 구현은 할수있다\
 메시지채널 (MessageChannel)API의 postMessage를 사용하면 setTimeout보다 빠르게 일을 처리할 수 있다
 
 
-### s A. fetch등의 Web API 함수들을 console.log로 확인해보면 `ƒ fetch() { [native code] }`라고 출력한다. 여기서 `[native code]`가 무슨 뜻인가?
+### A. fetch등의 Web API 함수들을 console.log로 확인해보면 `ƒ fetch() { [native code] }`라고 출력한다. 여기서 `[native code]`가 무슨 뜻인가?
 A. `[native code]`란 자바스크립트 내부의 코드가 아닌 js 실행코드를 관리하는 시스템에서 구현된 코드라는 의미이다. 이처럼 모든 웹 API는 자바스크립트 내부의 코드가 아닌 js 실행코드를 컨트롤하는 시스템 내부에 구현되어 있다. 크롬 웹브라우저의 예를 들면 웹 API는 렌더러 엔진인 블링크(blink) 내부에 구현되어 있다. 이 블링크는 C++로 구현되었고 따라서 블링크 내부에 구현된 웹 API도 C++로 구현되었다. fetch등의 웹 API가 실행되면 실행 흐름이 블링크 렌더러 엔진으로 전환되고 fetch함수에 대응되는 c++코드가 실행된다. 그 코드의 리턴값을 다시 자바스크립트 코드로 가져오는 흐름이 네이티브 코드의 실행방식이다.
 
-### s Q. fetch함수의 최종 응답객체인 리스폰스(Response) 객체에서 json메소드를 수행하면 json으로 변환된 값을 반환한다. 그런데 이 json 메소드를 다시 실행하면 에러가 발생한다.\
+### Q. fetch함수의 최종 응답객체인 리스폰스(Response) 객체에서 json메소드를 수행하면 json으로 변환된 값을 반환한다. 그런데 이 json 메소드를 다시 실행하면 에러가 발생한다.\
 `Uncaught (in promise) TypeError: Failed to execute 'json' on 'Response': body stream already read`\
 즉 json메소드는 한번밖에 사용할 수 없다. 그 이유가 왜인가?
 A. 이것은 순전히 메모리 최적화의 일환이었다. 한 번 json메소드가 호출되면 리스폰스 객체가 가지고 있는 원본 데이터는 메모리에서 해제된다. 다시말해 리스폰스 객체는 메모리 사용을 최소화하는 방향으로 설계되었다. `json()`메소드를 호출하면 중간 객체에서의 버퍼링을 작게 유지할 수 있도록 Response 객체의 데이터를 점진적으로 소비한다.\
@@ -413,26 +413,3 @@ A. 이것은 순전히 메모리 최적화의 일환이었다. 한 번 json메�
 json 객체가 생성되는 즉시 리스폰스 데이터를 해제할 수 있도록 설계하면 메모리 크기를 `소형크기의 버퍼 + 1MB` 정도로 줄일 수 있다.\
 리스폰스 바디를 재사용하고 싶을 때만 클론`clone` 메소드를 사용하여 수동으로 객체를 복제할 수 있다.
 [출처](https://github.com/whatwg/fetch/issues/196)
-
----
-
-##  해결되지 않은 질문들
-
-# Q. 만일 어떤 함수가 단지 값을 리턴하기만 하는 순수함수인데 그 리턴된 값이 어느곳에서도 사용되지 않았다면 그 함수는 애초에 호출할 필요가 없는 함수였다. 이같은 상황에서 자바스크립트 컴파일러는 함수를 호출하지 않도록 최적화를 수행할 수 있는가 ?\
-A. [참고](https://stackoverflow.com/questions/62011982/does-javascript-v8-optimizes-unused-return-values)
-
-# Q. 자바스크립트에는 심볼이라는 기능이 있는데 정확히 이게 왜 필요한가 ?
-
-# Q. 자바스크립트의 객체는 딕셔너리 구조로 되어있다.  다른말로 객체는 맵(Map)과 같다. 그런데도 자바스크립트에는 맵이 따로 구현되어 있다. 이미 맵과 거의 유사한 객체라는 개념이 있는데 왜 굳이 맵을 별도로 구현하였는가 ?
-https://stackoverflow.com/questions/18541940/map-vs-object-in-javascript
-https://stackoverflow.com/questions/32600157/maps-vs-objects-in-es6-when-to-use
-
-
-# Q. js에는 set이라는 자료구조가 있는데 이건 언제 사용하는건가 ?
-
-# Q. `javascript:void(0);`이 무슨 뜻인가 ?
-
-# Q . 오픈소스에서 `void 0` 라고 표기하는 경우가 보이는데 이건 무슨 뜻인가 ?;
-
-
-# Q. Object.toString.call()과 Object.prototype.toString.call()은 값이 다르다. 왜 그런가?

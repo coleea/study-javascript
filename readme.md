@@ -394,6 +394,67 @@ A. 빌트인 기능은 없다. 하지만 비슷하게 구현은 할수있다\
 (from, to) => [...Array(to - from)].map((_,i)=> i + from)
 ```
 
+##### 직렬화가 무엇인가 ?
+특정한 자료구조를 문자열로 바꾸는 작업을 말한다. js에서는 JSON.stringify메소드로 직렬화할 수 있다.\
+직렬화는 주로 네트워크간 통신때 데이터를 넘겨줄때 사용한다.\
+직렬화할 때 정의되지 값이 undefined 이거나 함수거나 심볼인 프로퍼티는 무시된다. 예를들어
+
+```javascript
+const 직렬화전 = {
+    a : undefined,
+    b : function a(){},
+    c : Symbol(`a`),
+    d : 'd'
+}
+const 직렬화후 = JSON.stringify(직렬화전);
+console.log(직렬화후)
+```
+
+이 코드에서 `직렬화후`의 값은 `{"d":"d"}`이다. a, b, c라는 프로퍼티가 있었지만 이 프로퍼티는 직렬화되지 않았다.\
+값이 undefined 이거나 함수거나 심볼인 프로퍼티는 직렬화되지 않는것이 확인된다.\
+또한 키(key) 값이 심볼인 경우에도 값이 해당 프로퍼티는 생략된다. 예를 들어
+
+```javascript
+const 직렬화전 = {
+    [Symbol(`a`)] : 1,
+}
+const 직렬화후 = JSON.stringify(직렬화전);
+console.log(직렬화후)
+```
+이 객체는 키로 심볼을 사용했으므로 `직렬화후`의 값은 `"{}"`이다\
+\
+배열도 직렬화가 가능하다. 다만 배열의 원소가 undefined이거나 함수거나 심볼인 경우에는 null로 변환된다. 예를들어
+```javascript
+const 직렬화전 = [1, null, undefined, function a(){}, Symbol('')]
+const 직렬화후 = JSON.stringify(직렬화전);
+console.log(직렬화후)
+```
+위의 예에서 `직렬화후`의 값은 `"[1,null,null,null,null]"`이다.\
+\
+직렬화할 때 무한 순환참조되는 객체는 직렬화할 수 없다. 예를 들어
+```javascript
+const a = {}
+const b = {}
+
+a.b = b
+b.a = a
+
+JSON.stringify(a)
+```
+위의 예제는 a에서 객체 b를 참고하는데 객체 b에서는 a를 참고하는 무한순환이 이루어지는 경우다. 이 경우 `JSON.stringify(a)`를 수행하면 `Uncaught TypeError: Converting circular structure to JSON` 라는 에러가 발생한다
+
+
+Q. 아래 코드는 fetch한 이후에 리스폰스 객체를 직렬화하는 코드다
+
+```javascript
+const 직렬화전 = await fetch(`www.naver.com`)
+const 직렬화후 = JSON.stringify(직렬화전)
+console.log(직렬화후)
+```
+
+이 코드에서 `직렬화전`의 값은 `Response 객체`였다. 하지만 직렬화후의 값은 `'{}'`이다. 즉 어떤것도 직렬화되지 않았다. 그 이유가 무엇인가?\
+A. 모르겠음
+
 ---
 
 ## js 런타임 환경

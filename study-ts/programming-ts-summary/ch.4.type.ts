@@ -1,0 +1,1 @@
+export type 더하기시그니처 = (a:number, b:number) => number
